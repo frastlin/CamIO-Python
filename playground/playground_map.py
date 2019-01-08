@@ -12,7 +12,7 @@ def callback2():
 	spk("Fire")
 
 def on_move2(event):
-	pass
+	sound1.set_pos(*event.nearest_point)
 
 
 
