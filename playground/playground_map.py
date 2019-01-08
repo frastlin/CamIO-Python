@@ -9,14 +9,14 @@ grid = AdvancedGrid(step_sounds=["grid_sounds/step2.ogg", "grid_sounds/step3.ogg
 sound1 = Sound("playground_sounds/bench.ogg", position=[10,10])
 
 def callback2():
-	spk("Fire")
+#	spk("Fire")
+	pass
 
 def on_move2(event):
-	sound1.set_pos(*event.nearest_point)
+	if event.in_poly:
+		spk("in poly")
 
-
-
-grid.add_polygon([(4,4), (5, 7), (8,7), (8,4)], callback=callback2, on_move=on_move2)
+grid.add_polygon([(4,4), (4,7), (8,7), (8,4)], callback=callback2, on_move=on_move2, sound=sound1)
 
 @my_app.add_handler
 def on_input(event):

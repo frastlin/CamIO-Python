@@ -16,8 +16,8 @@ int_or_ext = 0 #internal webcam or external USB webcam (doesn't work reliably, b
 
 #which_stylus = 'stylus_half_inch_dowel'; stylus_length = 15.0 #length from top to tip in cm
 #which_stylus = 'stylus_1_inch_dowel'; stylus_length = 12.8 #length from top to tip in cm
-#which_stylus = 'stylus_2_inch_box'; stylus_length = 15.3 + 0*6.2 # 15.3 #length from top to tip in cm
-which_stylus = 'stylus_2_inch_dowel'; stylus_length = 22.2 #length from top to tip in cm
+which_stylus = 'stylus_2_inch_box'; stylus_length = 17.5 #+ 0*6.2 # 15.3 #length from top to tip in cm
+#which_stylus = 'stylus_2_inch_dowel'; stylus_length = 22.2 #length from top to tip in cm
 
 ground_plane_marker_ID = 249
 ground_plane_marker_length = 5.0 #cm
