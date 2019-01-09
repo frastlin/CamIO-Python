@@ -27,15 +27,23 @@ from smoothing import Smoothing
 import pygame
 from pygame.locals import *
 
-from pyaudiogame import App, global_keymap
+import pyaudiogame
+from pyaudiogame import App, global_keymap, event_queue
+from pyaudiogame import speak as spk
+
 my_app = App("CamIO")
+pyaudiogame.speech.always_print = True
 
 # add key commands to the keymap
-"""
 global_keymap.add([
 	{'key': '0', 'event': 'scan_ground_plane_marker'},
+{'key':'1','event':'save_at_location_1'},
+{'key':'2', 'event':'save_at_location_2'},
+{'key':'a', 'event':'save_at_location_a'},
+{'key':'b', 'event':'save_at_location_2'},
+{'key':'4', 'event':'get_xyz_coordinates'},
+{'key':'3', 'event':'save_pose'},
 ])
-"""
 
 #############################################################
 camera = CAMERAS[which_camera]
@@ -83,6 +91,12 @@ def quit():
 
 #############################################################
 
+def play_ambient_sound():
+	if stylus_object.visible:
+		sound_object.play_ambient_visible()
+	else:
+		sound_object.play_ambient_invisible()
+
 def in_main_loop():
 	"""Runs every loop"""
 	global cnt, pose_known, corners, ids, next_scheduled_ambient_sound
@@ -104,41 +118,37 @@ def in_main_loop():
 		obs_smoothed = smoothing_object.add_observation(obs, timestamp)
 		current_hotspot, obs_smoothed_old = take_action(obs_smoothed, obs_smoothed_old, sound_object)
 
-	#ambient sound:
-	if timestamp >= next_scheduled_ambient_sound:
-		next_scheduled_ambient_sound = timestamp + AMBIENT_PERIOD
-		if stylus_object.visible:
-			sound_object.play_ambient_visible()
-		else:
-			sound_object.play_ambient_invisible()
 	update_display(my_app.displaySurface, frameBGR, decimation)
 
 @my_app.add_handler
 def on_input(event):
 	global stylus_info_at_location_a, stylus_info_at_location_b, plane_pose
-	event = event.event
-	if event.type == KEYDOWN:
-		if event.key == pygame.K_0:
-			plane_pose, Tca = scan_ground_plane_marker(corners, ids, camera_object, sound_object)
+	e = event.keymap_event
+	if e == 'scan_ground_plane_marker':
+		plane_pose, Tca = scan_ground_plane_marker(corners, ids, camera_object, sound_object)
 
-		if stylus_object.visible:
-			if event.key == pygame.K_1:
-				stylus_info_at_location_1 = save_stylus_info(stylus_object, sound_object)
-			if event.key == pygame.K_2:
-				stylus_info_at_location_2 = save_stylus_info(stylus_object, sound_object)
-				plane_pose, Tac = estimate_ground_plane_from_two_stylus_scans(stylus_info_at_location_1, stylus_info_at_location_2, sound_object)
-			if event.key == pygame.K_a:
-				stylus_info_at_location_a = save_stylus_info(stylus_object, sound_object)
-			if event.key == pygame.K_b:
-				stylus_info_at_location_b = save_stylus_info(stylus_object, sound_object)
-			if pose_known:
-				if event.key == pygame.K_4:
-					print('stylus XYZ location in annotation coordinates:', stylus_location_XYZ_anno)
+	if stylus_object.visible:
+		if e == 'save_at_location_1':
+			stylus_info_at_location_1 = save_stylus_info(stylus_object, sound_object)
+		elif e == 'save_at_location_2':
+			stylus_info_at_location_2 = save_stylus_info(stylus_object, sound_object)
+			plane_pose, Tac = estimate_ground_plane_from_two_stylus_scans(stylus_info_at_location_1, stylus_info_at_location_2, sound_object)
+		elif e == 'save_at_location_a':
+			stylus_info_at_location_a = save_stylus_info(stylus_object, sound_object)
+		elif e == 'save_at_location_b':
+			stylus_info_at_location_b = save_stylus_info(stylus_object, sound_object)
+		if pose_known:
+			if e == 'get_xyz_coordinates':
+				spk('stylus XYZ location in annotation coordinates:', stylus_location_XYZ_anno)
 
-		if event.key == pygame.K_3:
-			pose_known, pose, Tca = estimate_pose(stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, np.array(hotspots[anchor_1_ind]),
-												  np.array(hotspots[anchor_2_ind]), sound_object)
+	if e == 'save_pose':
+		pose_knowna, pose, Tca = estimate_pose(stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, np.array(hotspots[anchor_1_ind]),
+											  np.array(hotspots[anchor_2_ind]), sound_object)
 
+# schedule the ambient sound to play
+event_queue.schedule(function=play_ambient_sound, delay=AMBIENT_PERIOD, repeats=-1)
+
+# add the above functions to the my_app object so they will run, and call run on the my_app object
 my_app.in_main_loop = in_main_loop
 my_app.quit = quit
 my_app.run()
