@@ -4,6 +4,7 @@
 from gtts import gTTS #use to generate .mp3 files (saved in advance) for each possible utterance
 import pygame #to play sounds
 import os
+from pyaudiogame.mixer import Sound
 
 # Overview:
 # Need to be able to halt TTS utterance in progress,
@@ -16,21 +17,25 @@ import os
 # 3) James’s experience with pygame.mixer.Channel(0).play(pygame.mixer.Sound(...)) :
 # Only some .wav formats work. One is Wave PCM signed 16 bit, 16000 Hz, stereo
 
-AMBIENT = '../res/sounds-common/beat-single.wav' #AMBIENT sound (single beat) indicates ground plane visible
-AMBIENT2 = '../res/sounds-common/beat-double.wav' #AMBIENT2 sound indicates stylus visible
+AMBIENT_INVISIBLE = Sound('../res/sounds-common/beat-single.wav') #AMBIENT sound (single beat) indicates ground plane visible
+AMBIENT_VISIBLE = Sound('../res/sounds-common/beat-double.wav') #AMBIENT2 sound indicates stylus visible
 AMBIENT_PERIOD = 1.0 #period of ambient sound, in sec.
 BLIP = '../res/sounds-common/pop.wav' #BLIP indicates we just arrived at hotspot (currently not used)
 
+# sounds
+
+
+
+
 class Sounds:
 	def __init__(self, object_path, labels, labels_secondary):
-		pygame.mixer.quit()
-		pygame.mixer.pre_init(48000,-16, 1, 2048)
-		pygame.mixer.init()
-
 		#generate sound files if they don't already exist
 		self.object_path = object_path
-		if not os.path.exists(object_path+'sounds'): #need to generate all TTS labels as .mp3 files:
-			os.makedirs(object_path+'sounds')
+		self.generate_gtts_labels(object_path, labels, labels_secondary, sound_folder='sounds')
+
+	def generate_gtts_labels(self, object_path, labels, labels_secondary, sound_folder='sounds'):
+		if not os.path.exists(self.object_path+sound_folder): #need to generate all TTS labels as .mp3 files:
+			os.makedirs(object_path+sound_folder)
 			print('Generating sounds, please wait...')
 			for item in labels:
 				s = labels[item]
@@ -40,30 +45,30 @@ class Sounds:
 				tts = gTTS(text=s, lang='en')
 				try:
 					print('saving:',s)
-					ret = tts.save(object_path+'sounds/'+str(item)+'.mp3')
+					ret = tts.save(object_path+sound_folder+'/'+str(item)+'.mp3')
 					print('ret:',ret)
 				except: #sound file is already open
 					print('exception')
 					pass
 			print('Done generating sounds.')
-		
+
 	def play_ambient_invisible(self):
-		pygame.mixer.Channel(0).play(pygame.mixer.Sound('../res/sounds-common/beat-single.wav'))
-	
+		AMBIENT_INVISIBLE.play()
+
 	def play_ambient_visible(self):
-		pygame.mixer.Channel(0).play(pygame.mixer.Sound('../res/sounds-common/beat-double.wav'))
-				
+		AMBIENT_VISIBLE.play()
+
 	def play_wav(self, fname):
-		pygame.mixer.Channel(0).play(pygame.mixer.Sound(fname))
-		
+		Sound(fname).play()
+
 	def play_mp3(self, fname):
 		pygame.mixer.music.load(fname)
 		pygame.mixer.music.play()
-		
+
 	def play_hotspot(self, hotspot): #play specified hotspot (1, 2, 3, ...)
 		#self.play_wav(BLIP) #uncomment to preface TTS announcement with BLIP
 		self.play_mp3(self.object_path+'sounds/'+str(hotspot)+'.mp3')
-		
+
 	def halt_TTS(self):
 		pygame.mixer.music.stop()
-		
+
