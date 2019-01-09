@@ -1,6 +1,7 @@
 #UI.py
 #(c) James Coughlan, Smith-Kettlewell Eye Research Institute
 
+from pyaudiogame import speak as spk
 import numpy as np
 import cv2
 import time
@@ -23,7 +24,7 @@ def scan_ground_plane_marker(corners, ids, camera_object, sound_object):
 			Tmc = assemble_transformation(plane_pose[0], plane_pose[1])
 			Tac = Tmc + 0. #in this application they are identical
 			pose_known = True
-			print('Estimated ground plane.')
+			spk('Estimated ground plane.')
 			#sound_object.play_mp3('sounds/ground plane captured.mp3')
 			
 	return plane_pose, Tac
@@ -34,7 +35,7 @@ def estimate_ground_plane_from_two_stylus_scans(stylus_info_at_location_1, stylu
 		Tmc = assemble_transformation(plane_pose[0], plane_pose[1])
 		Tac = Tmc + 0. #in this application they are identical
 		pose_known = True
-		print('Estimated ground plane.')
+		spk('Estimated ground plane.')
 		#TO DO: add sound
 		#sound_object.play_mp3('sounds/pose complete.mp3')
 
@@ -42,7 +43,7 @@ def estimate_ground_plane_from_two_stylus_scans(stylus_info_at_location_1, stylu
 
 def save_stylus_info(stylus_object, sound_object):
 	stylus_info_at_location = deepcopy(stylus_object)
-	print('Stylus position captured.')
+	spk('Stylus position captured.')
 	#TO DO: add sound
 	return stylus_info_at_location
 
@@ -57,10 +58,10 @@ def estimate_pose(stylus_info_at_location_a, stylus_info_at_location_b, plane_po
 		pose_known = True
 		rvec, tvec = convert4x4_to_rvec_tvec(Tac)
 		pose = rvec, tvec
-		print('Estimated pose.')
+		spk('Estimated pose.')
 		#TO DO: add sound
 	else:
-		print("Can't estimate pose.")
+		spk("Can't estimate pose.")
 	return pose_known, pose, Tca
 
 def estimate_stylus_location_in_annotation_coors(stylus_location_XYZ_raw, Tca, sound_object):
