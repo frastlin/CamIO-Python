@@ -76,7 +76,6 @@ print('Image height, width:', camera_object.h, camera_object.w)
 KEYBOARD_GRID = False
 LAST_POSE = [0,0,0]
 cnt = 0
-timestamp0, next_scheduled_ambient_sound = time.time(), 0.
 pose_known = False
 stylus_info_at_location_1, stylus_info_at_location_2, stylus_info_at_location_a, stylus_info_at_location_b = None, None, None, None
 pose, plane_pose, Tca, stylus_location_XYZ_anno = None, None, None, None
@@ -109,9 +108,8 @@ def play_ambient_sound():
 
 def in_main_loop():
 	"""Runs every loop"""
-	global cnt, pose_known, corners, ids, next_scheduled_ambient_sound
+	global cnt, pose_known, corners, ids, LAST_POSE
 	cnt += 1
-	timestamp = time.time() - timestamp0
 	ret, frameBGR = cap.read()
 	gray = cv2.cvtColor(frameBGR, cv2.COLOR_BGR2GRAY)
 	corners, ids = detectMarkers_clean(gray, marker_object.arucodict, marker_object.arucodetectparam)
@@ -126,8 +124,10 @@ def in_main_loop():
 		obs = quantize_location(stylus_object.visible, stylus_location_XYZ_anno, hotspots)
 		obs_smoothed = smoothing_object.add_observation(obs, timestamp)
 		current_hotspot, obs_smoothed_old = take_action(obs_smoothed, obs_smoothed_old, sound_object)
-	if LAST_POSE != 
-
+	if stylus_object.visible and pose_known and LAST_POSE != stylus_location_XYZ_anno:
+		LAST_POSE = stylus_location_XYZ_anno
+		x, y, z = stylus_location_XYZ_anno
+		grid.set_pos(x, y)
 	update_display(my_app.displaySurface, frameBGR, decimation)
 
 @my_app.add_handler
