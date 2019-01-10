@@ -25,14 +25,21 @@ from parameters import *
 from UI import *
 from smoothing import Smoothing
 import pygame
-from pygame.locals import *
+
+###############
+#pyaudiogame code
 
 import pyaudiogame
 from pyaudiogame import App, global_keymap, event_queue
 from pyaudiogame import speak as spk
+from pyaudiogame.ui.grid import AdvancedGrid
+from playground.objects import object_list
 
 my_app = App("CamIO")
 pyaudiogame.speech.always_print = True
+
+grid = AdvancedGrid(width=84, height=67, step_sounds=["playground/grid_sounds/step2.ogg", "playground/grid_sounds/step3.ogg"], hit_sounds=["playground/grid_sounds/hit.ogg"])
+[grid.add_polygon(p) for p in object_list]
 
 # add key commands to the keymap
 global_keymap.add([
@@ -43,6 +50,7 @@ global_keymap.add([
 {'key':'b', 'event':'save_at_location_2'},
 {'key':'4', 'event':'get_xyz_coordinates'},
 {'key':'3', 'event':'save_pose'},
+{'key': 'tab', 'event':'switch_grid'},
 ])
 
 #############################################################
@@ -65,6 +73,8 @@ cap.set(cv2.CAP_PROP_FOCUS,0) #set focus #5 often good for smaller objects and n
 print('Image height, width:', camera_object.h, camera_object.w)
 
 #global variables
+KEYBOARD_GRID = False
+LAST_POSE = [0,0,0]
 cnt = 0
 timestamp0, next_scheduled_ambient_sound = time.time(), 0.
 pose_known = False
@@ -111,18 +121,18 @@ def in_main_loop():
 		frameBGR = plot_stylus_camera(frameBGR, stylus_object.tip_XYZ[0],stylus_object.tip_XYZ[1],stylus_object.tip_XYZ[2], camera_object.mtx, camera_object.dist)
 		if pose_known:
 			stylus_location_XYZ_anno = estimate_stylus_location_in_annotation_coors(stylus_object.tip_XYZ, Tca, sound_object)
-
 	if pose_known:
 		frameBGR = plot_hotspots(frameBGR, hotspots, current_hotspot, pose[0], pose[1], camera_object.mtx, camera_object.dist)
 		obs = quantize_location(stylus_object.visible, stylus_location_XYZ_anno, hotspots)
 		obs_smoothed = smoothing_object.add_observation(obs, timestamp)
 		current_hotspot, obs_smoothed_old = take_action(obs_smoothed, obs_smoothed_old, sound_object)
+	if LAST_POSE != 
 
 	update_display(my_app.displaySurface, frameBGR, decimation)
 
 @my_app.add_handler
 def on_input(event):
-	global stylus_info_at_location_a, stylus_info_at_location_b, plane_pose
+	global stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, KEYBOARD_GRID
 	e = event.keymap_event
 	if e == 'scan_ground_plane_marker':
 		plane_pose, Tca = scan_ground_plane_marker(corners, ids, camera_object, sound_object)
@@ -144,6 +154,12 @@ def on_input(event):
 	if e == 'save_pose':
 		pose_knowna, pose, Tca = estimate_pose(stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, np.array(hotspots[anchor_1_ind]),
 											  np.array(hotspots[anchor_2_ind]), sound_object)
+	elif e == 'switch_grid':
+		KEYBOARD_GRID = not KEYBOARD_GRID
+		spk("Keyboard grid on" if KEYBOARD_GRID else "Keyboard grid off")
+
+	if KEYBOARD_GRID:
+		grid.move(event)
 
 # schedule the ambient sound to play
 event_queue.schedule(function=play_ambient_sound, delay=AMBIENT_PERIOD, repeats=-1)
