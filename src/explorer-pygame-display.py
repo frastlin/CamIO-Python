@@ -38,7 +38,7 @@ from playground.objects import object_list
 my_app = App("CamIO")
 pyaudiogame.speech.always_print = True
 
-grid = AdvancedGrid(width=84, height=67, step_sounds=["playground/grid_sounds/step2.ogg", "playground/grid_sounds/step3.ogg"], hit_sounds=["playground/grid_sounds/hit.ogg"])
+grid = AdvancedGrid(width=76, height=62, step_sounds=["playground/grid_sounds/step2.ogg", "playground/grid_sounds/step3.ogg"], hit_sounds=["playground/grid_sounds/hit.ogg"])
 [grid.add_polygon(p) for p in object_list]
 
 # add key commands to the keymap
@@ -47,7 +47,7 @@ global_keymap.add([
 {'key':'1','event':'save_at_location_1'},
 {'key':'2', 'event':'save_at_location_2'},
 {'key':'a', 'event':'save_at_location_a'},
-{'key':'b', 'event':'save_at_location_2'},
+{'key':'b', 'event':'save_at_location_b'},
 {'key':'4', 'event':'get_xyz_coordinates'},
 {'key':'3', 'event':'save_pose'},
 {'key': 'tab', 'event':'switch_grid'},
@@ -132,7 +132,7 @@ def in_main_loop():
 
 @my_app.add_handler
 def on_input(event):
-	global stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, KEYBOARD_GRID
+	global stylus_info_at_location_1, stylus_info_at_location_2, stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, KEYBOARD_GRID
 	e = event.keymap_event
 	if e == 'scan_ground_plane_marker':
 		plane_pose, Tca = scan_ground_plane_marker(corners, ids, camera_object, sound_object)

@@ -1,7 +1,3 @@
-"""
-add xyz coords to move the pos
-
-"""
 import pyaudiogame
 from pyaudiogame import speak as spk
 from pyaudiogame.ui.grid import AdvancedGrid
@@ -9,7 +5,7 @@ from pyaudiogame.mixer import Sound, get_listener
 from poly_class import CamIOPolygon as P
 my_app = pyaudiogame.App("Playground Test")
 
-grid = AdvancedGrid(width=84, height=67, step_sounds=["grid_sounds/step2.ogg", "grid_sounds/step3.ogg"], hit_sounds=["grid_sounds/hit.ogg"])
+grid = AdvancedGrid(width=76, height=62, step_sounds=["grid_sounds/step2.ogg", "grid_sounds/step3.ogg"], hit_sounds=["grid_sounds/hit.ogg"])
 
 polys = [
 P('bench', [(4,4), (4,7), (8,7), (8,4)])
