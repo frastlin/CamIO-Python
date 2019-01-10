@@ -40,7 +40,7 @@ global_keymap.add([
 {'key':'1','event':'save_at_location_1'},
 {'key':'2', 'event':'save_at_location_2'},
 {'key':'a', 'event':'save_at_location_a'},
-{'key':'b', 'event':'save_at_location_2'},
+{'key':'b', 'event':'save_at_location_b'},
 {'key':'4', 'event':'get_xyz_coordinates'},
 {'key':'3', 'event':'save_pose'},
 ])
