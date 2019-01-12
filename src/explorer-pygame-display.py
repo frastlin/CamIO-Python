@@ -108,7 +108,7 @@ def play_ambient_sound():
 
 def in_main_loop():
 	"""Runs every loop"""
-	global cnt, pose_known, corners, ids, LAST_POSE
+	global cnt, frameBGR, pose_known, corners, ids, current_hotspot, pose, hotspots, camera_object, stylus_location_XYZ_anno, LAST_POSE
 	cnt += 1
 	ret, frameBGR = cap.read()
 	gray = cv2.cvtColor(frameBGR, cv2.COLOR_BGR2GRAY)
@@ -132,7 +132,7 @@ def in_main_loop():
 
 @my_app.add_handler
 def on_input(event):
-	global stylus_info_at_location_1, stylus_info_at_location_2, stylus_info_at_location_a, stylus_info_at_location_b, pose_known, plane_pose, KEYBOARD_GRID
+	global stylus_info_at_location_1, stylus_info_at_location_2, stylus_info_at_location_a, stylus_info_at_location_b, pose_known, plane_pose, pose, KEYBOARD_GRID
 	e = event.keymap_event
 	if e == 'scan_ground_plane_marker':
 		plane_pose, Tca = scan_ground_plane_marker(corners, ids, camera_object, sound_object)
