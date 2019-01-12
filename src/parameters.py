@@ -25,7 +25,7 @@ ground_plane_marker_length = 5.0 #cm
 #object_path, object_fname = 'objects/house/', 'output.xlsx'
 #object_path, object_fname = 'objects/Southwest/', 'output.xlsx'
 #object_path, object_fname = 'objects/cell model/', 'output.xlsx'
-object_path, object_fname = '../res/objects/Southwest/', 'output.xlsx'
+object_path, object_fname = '../res/objects/playground/', 'output.xlsx'
 
 anchor_1_ind, anchor_2_ind = 1, 2 #by default, it's always the first two hotspots, respectively
 

@@ -11,7 +11,7 @@ class CamIOPolygon(Polygon):
 	def __init__(self, name, poly, bumperhand=False):
 		Polygon.__init__(self, poly, callback=self.callback, on_move=self.on_move)
 		self.name = name
-		self.sound = Sound('{1}playground_sounds/{0}.wav'.format(name, cwd), position=(1,1))
+		self.sound = Sound('{1}playground_sounds/{0}.ogg'.format(name, cwd), position=(1,1))
 		self.sound.play(loops=-1)
 		self.bumperhand = False
 

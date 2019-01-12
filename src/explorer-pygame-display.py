@@ -117,7 +117,7 @@ def in_main_loop():
 	frameBGR = plot_corners(frameBGR, corners, ids)
 	if stylus_object.visible:
 		frameBGR = plot_stylus_camera(frameBGR, stylus_object.tip_XYZ[0],stylus_object.tip_XYZ[1],stylus_object.tip_XYZ[2], camera_object.mtx, camera_object.dist)
-		if pose_known:
+		if not pose_known:
 			stylus_location_XYZ_anno = estimate_stylus_location_in_annotation_coors(stylus_object.tip_XYZ, Tca, sound_object)
 	if pose_known:
 		frameBGR = plot_hotspots(frameBGR, hotspots, current_hotspot, pose[0], pose[1], camera_object.mtx, camera_object.dist)
