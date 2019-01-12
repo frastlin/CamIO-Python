@@ -122,7 +122,7 @@ def in_main_loop():
 
 @my_app.add_handler
 def on_input(event):
-	global stylus_info_at_location_a, stylus_info_at_location_b, plane_pose
+	global stylus_info_at_location_1, stylus_info_at_location_2, stylus_info_at_location_a, stylus_info_at_location_b, pose_known, plane_pose
 	e = event.keymap_event
 	if e == 'scan_ground_plane_marker':
 		plane_pose, Tca = scan_ground_plane_marker(corners, ids, camera_object, sound_object)
@@ -142,7 +142,7 @@ def on_input(event):
 				spk('stylus XYZ location in annotation coordinates:', stylus_location_XYZ_anno)
 
 	if e == 'save_pose':
-		pose_knowna, pose, Tca = estimate_pose(stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, np.array(hotspots[anchor_1_ind]),
+		pose_known, pose, Tca = estimate_pose(stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, np.array(hotspots[anchor_1_ind]),
 											  np.array(hotspots[anchor_2_ind]), sound_object)
 
 # schedule the ambient sound to play
