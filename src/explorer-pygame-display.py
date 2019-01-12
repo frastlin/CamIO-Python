@@ -117,7 +117,7 @@ def in_main_loop():
 	frameBGR = plot_corners(frameBGR, corners, ids)
 	if stylus_object.visible:
 		frameBGR = plot_stylus_camera(frameBGR, stylus_object.tip_XYZ[0],stylus_object.tip_XYZ[1],stylus_object.tip_XYZ[2], camera_object.mtx, camera_object.dist)
-		if not pose_known:
+		if pose_known:
 			stylus_location_XYZ_anno = estimate_stylus_location_in_annotation_coors(stylus_object.tip_XYZ, Tca, sound_object)
 	if pose_known:
 		frameBGR = plot_hotspots(frameBGR, hotspots, current_hotspot, pose[0], pose[1], camera_object.mtx, camera_object.dist)
@@ -132,7 +132,7 @@ def in_main_loop():
 
 @my_app.add_handler
 def on_input(event):
-	global stylus_info_at_location_1, stylus_info_at_location_2, stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, KEYBOARD_GRID
+	global stylus_info_at_location_1, stylus_info_at_location_2, stylus_info_at_location_a, stylus_info_at_location_b, pose_known, plane_pose, KEYBOARD_GRID
 	e = event.keymap_event
 	if e == 'scan_ground_plane_marker':
 		plane_pose, Tca = scan_ground_plane_marker(corners, ids, camera_object, sound_object)
@@ -152,7 +152,7 @@ def on_input(event):
 				spk('stylus XYZ location in annotation coordinates:', stylus_location_XYZ_anno)
 
 	if e == 'save_pose':
-		pose_knowna, pose, Tca = estimate_pose(stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, np.array(hotspots[anchor_1_ind]),
+		pose_known, pose, Tca = estimate_pose(stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, np.array(hotspots[anchor_1_ind]),
 											  np.array(hotspots[anchor_2_ind]), sound_object)
 	elif e == 'switch_grid':
 		KEYBOARD_GRID = not KEYBOARD_GRID
