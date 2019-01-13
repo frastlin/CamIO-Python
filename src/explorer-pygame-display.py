@@ -32,7 +32,7 @@ import pygame
 import pyaudiogame
 from pyaudiogame import App, global_keymap, event_queue
 from pyaudiogame import speak as spk
-from pyaudiogame.ui.grid import AdvancedGrid
+from camio_grid import AdvancedGrid
 from playground.objects import object_list
 
 my_app = App("CamIO")
@@ -76,6 +76,7 @@ print('Image height, width:', camera_object.h, camera_object.w)
 KEYBOARD_GRID = False
 LAST_POSE = [0,0,0]
 cnt = 0
+timestamp0 = time.time()
 pose_known = False
 stylus_info_at_location_1, stylus_info_at_location_2, stylus_info_at_location_a, stylus_info_at_location_b = None, None, None, None
 pose, plane_pose, Tca, stylus_location_XYZ_anno = None, None, None, None
@@ -108,8 +109,9 @@ def play_ambient_sound():
 
 def in_main_loop():
 	"""Runs every loop"""
-	global cnt, frameBGR, pose_known, corners, ids, current_hotspot, pose, hotspots, camera_object, stylus_location_XYZ_anno, LAST_POSE
+	global cnt, timestamp0, Tca, obs_smoothed_old, frameBGR, pose_known, corners, ids, current_hotspot, pose, hotspots, camera_object, stylus_location_XYZ_anno, LAST_POSE
 	cnt += 1
+	timestamp = time.time() - timestamp0
 	ret, frameBGR = cap.read()
 	gray = cv2.cvtColor(frameBGR, cv2.COLOR_BGR2GRAY)
 	corners, ids = detectMarkers_clean(gray, marker_object.arucodict, marker_object.arucodetectparam)
@@ -124,15 +126,15 @@ def in_main_loop():
 		obs = quantize_location(stylus_object.visible, stylus_location_XYZ_anno, hotspots)
 		obs_smoothed = smoothing_object.add_observation(obs, timestamp)
 		current_hotspot, obs_smoothed_old = take_action(obs_smoothed, obs_smoothed_old, sound_object)
-	if stylus_object.visible and pose_known and LAST_POSE != stylus_location_XYZ_anno:
+	if stylus_object.visible and pose_known and LAST_POSE[0] != stylus_location_XYZ_anno[0] and LAST_POSE[1] != stylus_location_XYZ_anno[1]:
 		LAST_POSE = stylus_location_XYZ_anno
 		x, y, z = stylus_location_XYZ_anno
-		grid.set_pos(x, y)
+		grid.xyz_set_pos(x, y, z)
 	update_display(my_app.displaySurface, frameBGR, decimation)
 
 @my_app.add_handler
 def on_input(event):
-	global stylus_info_at_location_1, stylus_info_at_location_2, stylus_info_at_location_a, stylus_info_at_location_b, pose_known, plane_pose, pose, KEYBOARD_GRID
+	global Tca, stylus_info_at_location_1, stylus_info_at_location_2, stylus_info_at_location_a, stylus_info_at_location_b, pose_known, plane_pose, pose, KEYBOARD_GRID
 	e = event.keymap_event
 	if e == 'scan_ground_plane_marker':
 		plane_pose, Tca = scan_ground_plane_marker(corners, ids, camera_object, sound_object)
@@ -149,7 +151,7 @@ def on_input(event):
 			stylus_info_at_location_b = save_stylus_info(stylus_object, sound_object)
 		if pose_known:
 			if e == 'get_xyz_coordinates':
-				spk('stylus XYZ location in annotation coordinates:', stylus_location_XYZ_anno)
+				spk('stylus XYZ location in annotation coordinates: {0}'.format(stylus_location_XYZ_anno))
 
 	if e == 'save_pose':
 		pose_known, pose, Tca = estimate_pose(stylus_info_at_location_a, stylus_info_at_location_b, plane_pose, np.array(hotspots[anchor_1_ind]),
