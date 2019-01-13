@@ -9,9 +9,10 @@ last_label = None
 
 class CamIOPolygon(Polygon):
 	def __init__(self, name, poly, height=8, bumperhand=False):
-		Polygon.__init__(self, poly, callback=self.callback, on_move=self.on_move)
-			name = self.convert_lower_camelcase(name)
+		self.poly = poly
+		name = self.convert_lower_camelcase(name)
 		self.name = name
+		self.grid = None
 		self.bumperhand = bumperhand
 		self.height = height
 
@@ -33,7 +34,7 @@ class CamIOPolygon(Polygon):
 			self.label.play()
 			last_label = self
 
-	def on_move(self, event):
+	def _on_move(self, event):
 		global last_label
 		if not event.in_poly and last_label == self:
 			last_label = None
