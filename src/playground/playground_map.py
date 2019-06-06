@@ -1,3 +1,6 @@
+"""
+This is only for testing and is not required for running the app.
+"""
 import pyaudiogame
 from pyaudiogame import speak as spk
 from pyaudiogame.ui.grid import AdvancedGrid

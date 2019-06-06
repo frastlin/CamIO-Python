@@ -27,30 +27,37 @@ from smoothing import Smoothing
 import pygame
 
 ###############
-#pyaudiogame code
-
+##pyaudiogame code
+# Importing modules
 import pyaudiogame
 from pyaudiogame import App, global_keymap, event_queue
 from pyaudiogame import speak as spk
 from camio_grid import AdvancedGrid
+## Importing the polygons that make up the playground
 from playground.objects import object_list
 
+## creating the pygame surface, starting the event queue, mixer, and all the stuff that comes along with a pyaudiogame App object
 my_app = App("CamIO")
+## always print pyaudiogame.speak to the console
 pyaudiogame.speech.always_print = True
 
+## Create a grid object. This object allows you to navigate around the grid by only using the arrow keys. The grid object has its own key map and can be activated by pressing "tab"
 grid = AdvancedGrid(width=76, height=62, step_sounds=["playground/grid_sounds/step2.ogg", "playground/grid_sounds/step3.ogg"], hit_sounds=["playground/grid_sounds/hit.ogg"])
+## Add all polygons to the grid
 [grid.add_polygon(p) for p in object_list]
 
-# add key commands to the keymap
+## add key commands to the keymap
+## This keymap abstracts the commands away from actions, so now future actions will always bee registered on the keymap, rather than being hard-coded. This allows key commands to be changed in the app if the UI is built for it.
+## "key" is the key command or combination that triggeres the event. "event" is the name of the registered event. Search down for the event name to jump to that function.
 global_keymap.add([
 	{'key': '0', 'event': 'scan_ground_plane_marker'},
-{'key':'1','event':'save_at_location_1'},
-{'key':'2', 'event':'save_at_location_2'},
-{'key':'a', 'event':'save_at_location_a'},
-{'key':'b', 'event':'save_at_location_b'},
-{'key':'4', 'event':'get_xyz_coordinates'},
-{'key':'3', 'event':'save_pose'},
-{'key': 'tab', 'event':'switch_grid'},
+	{'key':'1','event':'save_at_location_1'},
+	{'key':'2', 'event':'save_at_location_2'},
+	{'key':'a', 'event':'save_at_location_a'},
+	{'key':'b', 'event':'save_at_location_b'},
+	{'key':'4', 'event':'get_xyz_coordinates'},
+	{'key':'3', 'event':'save_pose'},
+	{'key': 'tab', 'event':'switch_grid'},
 ])
 
 #############################################################
@@ -108,7 +115,7 @@ def play_ambient_sound():
 		sound_object.play_ambient_invisible()
 
 def in_main_loop():
-	"""Runs every loop"""
+	"""Runs every loop. """
 	global cnt, timestamp0, Tca, obs_smoothed_old, frameBGR, pose_known, corners, ids, current_hotspot, pose, hotspots, camera_object, stylus_location_XYZ_anno, LAST_POSE
 	cnt += 1
 	timestamp = time.time() - timestamp0
@@ -129,11 +136,13 @@ def in_main_loop():
 	if stylus_object.visible and pose_known and LAST_POSE[0] != stylus_location_XYZ_anno[0] and LAST_POSE[1] != stylus_location_XYZ_anno[1]:
 		LAST_POSE = stylus_location_XYZ_anno
 		x, y, z = stylus_location_XYZ_anno
+		## This passes the XYZ coordinates to the grid object to allow for movement through the polygons
 		grid.xyz_set_pos(x, y, z)
 	update_display(my_app.displaySurface, frameBGR, decimation)
 
 @my_app.add_handler
 def on_input(event):
+	"""this function is run whenever there is some kind of input event. the event object has information about the event, but it also has the attribute keymap_event, which says if an action registered in the keymap was called. It is the string set in the "event" attribute in the dict passed to the keymap above."""
 	global Tca, stylus_info_at_location_1, stylus_info_at_location_2, stylus_info_at_location_a, stylus_info_at_location_b, pose_known, plane_pose, pose, KEYBOARD_GRID
 	e = event.keymap_event
 	if e == 'scan_ground_plane_marker':
@@ -161,12 +170,13 @@ def on_input(event):
 		spk("Keyboard grid on" if KEYBOARD_GRID else "Keyboard grid off")
 
 	if KEYBOARD_GRID:
+		## this is to move the pos with the keyboard only, not the stylus.
 		grid.move(event)
 
-# schedule the ambient sound to play
+## schedule the ambient sound to play
 event_queue.schedule(function=play_ambient_sound, delay=AMBIENT_PERIOD, repeats=-1)
 
-# add the above functions to the my_app object so they will run, and call run on the my_app object
+## add the above functions to the my_app object so they will run, and call run on the my_app object
 my_app.in_main_loop = in_main_loop
 my_app.quit = quit
 my_app.run()
