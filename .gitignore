@@ -36,3 +36,6 @@ doc/**/*.txt
 """
 
 src/.idea/
+
+# old_playground
+old_playground/
